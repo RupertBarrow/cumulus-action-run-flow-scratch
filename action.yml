@@ -13,7 +13,6 @@ inputs:
   org-name:
     description: 'Name of the scratch org config to use'
     required: true
-    default: feature
   flow-name:
     description: 'Name of the flow to be run'
     required: true
