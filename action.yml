@@ -1,0 +1,30 @@
+name: "Run flow in scratch org"
+description: "Create an unmanaged scratch org and run Apex tests"
+inputs:
+  cumulusci-version:
+    description: 'version of CumulusCI to install'
+    required: false
+  sfdx-version:
+    description: 'version of SFDX to install'
+    required: false
+  dev-hub-auth-url:
+    description: 'SFDX auth URL for the Dev Hub'
+    required: true
+  org-name:
+    description: 'Name of the scratch org config to use'
+    required: true
+    default: feature
+  flow-name:
+    description: 'Name of the flow to be run'
+    required: true
+    default: feature
+runs:
+  using: "composite"
+  steps:
+    - uses: cumulus-actions/run-flow-scratch@v1
+      with:
+        dev-hub-auth-url: '${{ inputs.dev-hub-auth-url }}'
+        org-name: '${{ inputs.org-name }}'
+        cumulusci-version: '${{ inputs.cumulusci-version }}'
+        sfdx-version: '${{ inputs.sfdx-version }}'
+        flow-name: '${{ inputs.flow-name }}'
