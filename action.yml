@@ -4,9 +4,11 @@ inputs:
   cumulusci-version:
     description: 'version of CumulusCI to install'
     required: false
+    default: 3.69.0
   sfdx-version:
     description: 'version of SFDX to install'
     required: false
+    default: 7.175.0
   dev-hub-auth-url:
     description: 'SFDX auth URL for the Dev Hub'
     required: true
