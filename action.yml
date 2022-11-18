@@ -10,6 +10,9 @@ inputs:
   dev-hub-auth-url:
     description: 'SFDX auth URL for the Dev Hub'
     required: true
+  cumulusci-service-github:
+    description: 'Value for CUMULUSCI_SERVICE_github'
+    required: true
   org-name:
     description: 'Name of the scratch org or persistent org config to use'
     required: true
@@ -49,6 +52,7 @@ runs:
     - name: Run Flow
       uses: RupertBarrow/cumulus-action-run-flow@main
       with:
+        cumulusci-service-github: '${{ inputs.cumulusci-service-github }}'
         org-name: '${{ inputs.org-name }}'
         flow-name: '${{ inputs.flow-name }}'
         flow-task-options: '${{ inputs.flow-task-options }}'
