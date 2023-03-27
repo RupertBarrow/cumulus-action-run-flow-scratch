@@ -39,7 +39,7 @@ runs:
   steps:
     - uses: actions/checkout@v3
     - name: Set Up CumulusCI
-      uses: cumulus-actions/setup-cumulus@v1
+      uses: RupertBarrow/setup-cumulus@rb/upgrade-to-setup-python-v_4_5_0
       with:
         cumulusci-version: '${{ inputs.cumulusci-version }}'
         sfdx-version: '${{ inputs.sfdx-version }}'
