@@ -79,12 +79,13 @@ runs:
       if: ${{ always() }}
       shell: bash
       run: |
+        which jq
         orginfo=`cci org info --org ${{ inputs.org-name }} --json | grep "is_sandbox"`
         echo "orginfo = $orginfo"
         IFS=":"
         read -a strarr <<< "$orginfo"
         is_sandbox=${strarr[1]}
         echo "is_sandbox = ###$is_sandbox###"
-        if [ "$is_sandbox" -eq " false," ]; then
+        if [ "$is_sandbox" = " false," ]; then
           cci org scratch_delete ${{ inputs.org-name }}
         fi
