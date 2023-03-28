@@ -72,6 +72,7 @@ runs:
       shell: bash
     - name: Delete Scratch Org
       if: ${{ always() }}
+      shell: bash
       run: |
         is_sandbox=`cci org info --org buildpack_eu --json | jq .is_sandbox`
         if [ ! $is_sandbox ]; then
