@@ -73,5 +73,7 @@ runs:
     - name: Delete Scratch Org
       if: ${{ always() }}
       run: |
-        cci org scratch_delete '${{ inputs.org-name }}'
-      shell: bash
+        is_sandbox=`cci org info --org buildpack_eu --json | jq .is_sandbox`
+        if [ ! $is_sandbox ]; then
+          cci org scratch_delete buildpack_eu
+        fi
