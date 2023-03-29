@@ -68,7 +68,8 @@ runs:
         cci flow run ${{ inputs.flow-name }} --org ${{ inputs.org-name }} ${{ inputs.flow-task-options }} 2>/tmp/err.log
         # see https://tfrommen.de/things-i-learned-while-replacing-a-github-app-with-github-actions-workflows/
         status=$?
-        if [ ! ("$status" = "0") ]; then
+        if [ "$status" != "0" ]; then
+          cat /tmp/err.log
           echo "error-message=$(cat /tmp/err.log)" >> $GITHUB_OUTPUT
           exit $status
         fi
