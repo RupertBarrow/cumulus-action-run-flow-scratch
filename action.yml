@@ -1,5 +1,6 @@
 name: Run Scratch Org Flow
 description: 'Execute a named CumulusCI flow'
+
 inputs:
   cumulusci-version:
     description: 'version of CumulusCI to install'
@@ -39,8 +40,10 @@ outputs:
   error-message:
     description: "Error message returned by the flow, if any"
     value: ${{ steps.run-flow.outputs.error-message }}
+  package-version:
+    description: "Package version number mentioned (created or failed creation)"
+    value: ${{ steps.run-flow.outputs.package-version }}
    
-    
 runs:
   using: "composite"
   steps:
@@ -67,13 +70,15 @@ runs:
       run: |
         cci flow run ${{ inputs.flow-name }} --org ${{ inputs.org-name }} ${{ inputs.flow-task-options }} 2>/tmp/err.log | tee /tmp/res.log
         # see https://tfrommen.de/things-i-learned-while-replacing-a-github-app-with-github-actions-workflows/
-        status=$?
+        status=${PIPESTATUS[0]}
         if [ "$status" != "0" ]; then
           cat /tmp/err.log
-          echo "error-message=\"$(cat /tmp/err.log)\"" >> $GITHUB_OUTPUT
-          exit $status
+          echo "error-message=$(cat /tmp/err.log)" >> $GITHUB_OUTPUT
         fi
-        
+        version=$(cat /tmp/res.log | grep "Version Number:" | sed 's/                      Version Number: //')
+        echo "package-version=$version" >> $GITHUB_OUTPUT
+        exit $status
+
     - name: Set Commit Status
       if: ${{ inputs.commit-status-regex && inputs.commit-status-name }}
       env:
