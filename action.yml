@@ -34,6 +34,13 @@ inputs:
     description: 'Value to prefix before regex result in commit status value'
     required: false
     default:
+
+outputs:
+  error-message:
+    description: "Error message returned by the flow, if any"
+    value: ${{ steps.run-flow.outputs.error-message }}
+   
+    
 runs:
   using: "composite"
   steps:
@@ -53,12 +60,18 @@ runs:
         dev-hub: true
         
     - name: Run Flow
-      uses: RupertBarrow/cumulus-action-run-flow@main
-      with:
-        cumulusci-service-github: '${{ inputs.cumulusci-service-github }}'
-        org-name: '${{ inputs.org-name }}'
-        flow-name: '${{ inputs.flow-name }}'
-        flow-task-options: '${{ inputs.flow-task-options }}'
+      id: run-flow
+      shell: bash {0}
+      env:
+        CUMULUSCI_SERVICE_github: ${{ inputs.cumulusci-service-github }}
+      run: |
+        cci flow run ${{ inputs.flow-name }} --org ${{ inputs.org-name }} ${{ inputs.flow-task-options }} 2>/tmp/err.log
+        # see https://tfrommen.de/things-i-learned-while-replacing-a-github-app-with-github-actions-workflows/
+        status=$?
+        if [ ! ("$status" = "0") ]; then
+          echo "error-message=$(cat /tmp/err.log)" >> $GITHUB_OUTPUT
+          exit $status
+        fi
         
     - name: Set Commit Status
       if: ${{ inputs.commit-status-regex && inputs.commit-status-name }}
