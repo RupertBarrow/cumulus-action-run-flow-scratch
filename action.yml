@@ -65,7 +65,7 @@ runs:
       env:
         CUMULUSCI_SERVICE_github: ${{ inputs.cumulusci-service-github }}
       run: |
-        cci flow run ${{ inputs.flow-name }} --org ${{ inputs.org-name }} ${{ inputs.flow-task-options }} 2>/tmp/err.log
+        cci flow run ${{ inputs.flow-name }} --org ${{ inputs.org-name }} ${{ inputs.flow-task-options }} 2>/tmp/err.log | tee /tmp/res.log
         # see https://tfrommen.de/things-i-learned-while-replacing-a-github-app-with-github-actions-workflows/
         status=$?
         if [ "$status" != "0" ]; then
