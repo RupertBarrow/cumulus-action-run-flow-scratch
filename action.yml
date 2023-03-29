@@ -70,7 +70,7 @@ runs:
         status=$?
         if [ "$status" != "0" ]; then
           cat /tmp/err.log
-          echo "error-message=$(cat /tmp/err.log)" >> $GITHUB_OUTPUT
+          echo "error-message=\"$(cat /tmp/err.log)\"" >> $GITHUB_OUTPUT
           exit $status
         fi
         
