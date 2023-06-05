@@ -63,23 +63,13 @@ runs:
         dev-hub: true
         
     - name: Run Flow
-      id: run-flow
-      shell: bash {0}
-      env:
-        CUMULUSCI_SERVICE_github: ${{ inputs.cumulusci-service-github }}
-      run: |
-        set -x
-        cci flow run ${{ inputs.flow-name }} --org ${{ inputs.org-name }} ${{ inputs.flow-task-options }} 2>/tmp/err.log | tee /tmp/res.log
-        # see https://tfrommen.de/things-i-learned-while-replacing-a-github-app-with-github-actions-workflows/
-        status=${PIPESTATUS[0]}
-        if [ "$status" != "0" ]; then
-          cat /tmp/err.log
-          echo "error-message=$(cat /tmp/err.log)" >> $GITHUB_OUTPUT
-        fi
-        version=$(cat /tmp/res.log | grep "Version Number:" | sed 's/                      Version Number: //')
-        echo "package-version=$version" >> $GITHUB_OUTPUT
-        exit $status
-
+      uses: RupertBarrow/cumulus-action-run-flow@main
+      with:
+        cumulusci-service-github: '${{ inputs.cumulusci-service-github }}'
+        org-name: '${{ inputs.org-name }}'
+        flow-name: '${{ inputs.flow-name }}'
+        flow-task-options: '${{ inputs.flow-task-options }}'
+        
     - name: Set Commit Status
       if: ${{ inputs.commit-status-regex && inputs.commit-status-name }}
       env:
@@ -99,10 +89,7 @@ runs:
       if: ${{ always() }}
       shell: bash
       run: |
-        orginfo=`cci org info --org ${{ inputs.org-name }} --json | grep is_sandbox`
-        IFS=':'
-        read -a strarr <<< "$orginfo"
-        is_sandbox=${strarr[1]}
-        if [ "$is_sandbox" = " false," ]; then
+        is_scratch=`cci org info --org ${{ inputs.org-name }} --json | grep -v "Getting" | jq .is_scratch`
+        if [ $is_scratch ]; then
           cci org scratch_delete ${{ inputs.org-name }}
         fi
