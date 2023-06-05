@@ -63,7 +63,7 @@ runs:
         dev-hub: true
         
     - name: Run Flow
-      uses: RupertBarrow/cumulus-action-run-flow@main
+      uses: RupertBarrow/cumulus-action-run-flow@v1
       with:
         cumulusci-service-github: '${{ inputs.cumulusci-service-github }}'
         org-name: '${{ inputs.org-name }}'
