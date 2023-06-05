@@ -90,7 +90,7 @@ runs:
       if: ${{ always() }}
       shell: bash
       run: |
-        is_scratch=`cci org info --org ${{ inputs.org-name }} --json | grep -v "Getting" | jq .is_scratch`
+        is_scratch=`cci org info --org ${{ inputs.org-name }} --json | jq .is_scratch`
         if [ $is_scratch ]; then
           cci org scratch_delete ${{ inputs.org-name }}
         fi
