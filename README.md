@@ -6,4 +6,4 @@ This action :
 - authorizes with the Dev Hub
 - runs the flow
 - sets a commit status in Github
-- delets the org if it's a scratch org
+- deletes the org if it's a scratch org
