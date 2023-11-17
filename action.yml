@@ -1,40 +1,44 @@
 name: Run Scratch Org Flow
-description: 'Execute a named CumulusCI flow'
+description: "Execute a named CumulusCI flow"
 
 inputs:
   cumulusci-version:
-    description: 'version of CumulusCI to install'
+    description: "version of CumulusCI to install"
     required: false
   sfdx-version:
-    description: 'version of SFDX to install'
+    description: "version of SFDX to install"
     required: false
   dev-hub-auth-url:
-    description: 'SFDX auth URL for the Dev Hub'
+    description: "SFDX auth URL for the Dev Hub"
     required: true
   cumulusci-service-github:
-    description: 'Value for CUMULUSCI_SERVICE_github'
+    description: "Value for CUMULUSCI_SERVICE_github"
     required: true
   org-name:
-    description: 'Name of the scratch org or persistent org config to use'
+    description: "Name of the scratch org or persistent org config to use"
     required: true
   flow-name:
-    description: 'Name of the Cumulus flow to execute'
+    description: "Name of the Cumulus flow to execute"
     required: true
   flow-task-options:
-    description: 'Task options passed to the flow'
+    description: "Task options passed to the flow"
     required: false
   commit-status-name:
-    description: 'Name of an optional extra commit status to set from build results'
+    description: "Name of an optional extra commit status to set from build results"
     required: false
-    default: 
+    default:
   commit-status-regex:
-    description: 'Regex to apply to flow log to locate commit status value'
+    description: "Regex to apply to flow log to locate commit status value"
     required: false
     default:
   commit-status-description-prefix:
-    description: 'Value to prefix before regex result in commit status value'
+    description: "Value to prefix before regex result in commit status value"
     required: false
     default:
+  delete-scratch-org:
+    description: "Delete the scratch org after the flow completes"
+    required: false
+    default: true
 
 outputs:
   error-message:
@@ -43,38 +47,38 @@ outputs:
   package-version:
     description: "Package version number mentioned (created or failed creation)"
     value: ${{ steps.run-flow.outputs.package-version }}
-   
+
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v3
-    
+
     - name: Set Up CumulusCI
       #uses: RupertBarrow/setup-cumulus@rb/upgrade-to-setup-python-v_4_5_0
       uses: cumulus-actions/setup-cumulus@v1
       with:
-        cumulusci-version: '${{ inputs.cumulusci-version }}'
-        sfdx-version: '${{ inputs.sfdx-version }}'
-        
+        cumulusci-version: "${{ inputs.cumulusci-version }}"
+        sfdx-version: "${{ inputs.sfdx-version }}"
+
     - name: Authorize Dev Hub
       uses: cumulus-actions/authorize-org@v1
       with:
-        auth-url: '${{ inputs.dev-hub-auth-url }}'
+        auth-url: "${{ inputs.dev-hub-auth-url }}"
         org-name: dev-hub
         dev-hub: true
-        
+
     - name: Run Flow
       uses: RupertBarrow/cumulus-action-run-flow@v1
       with:
-        cumulusci-service-github: '${{ inputs.cumulusci-service-github }}'
-        org-name: '${{ inputs.org-name }}'
-        flow-name: '${{ inputs.flow-name }}'
-        flow-task-options: '${{ inputs.flow-task-options }}'
-        
+        cumulusci-service-github: "${{ inputs.cumulusci-service-github }}"
+        org-name: "${{ inputs.org-name }}"
+        flow-name: "${{ inputs.flow-name }}"
+        flow-task-options: "${{ inputs.flow-task-options }}"
+
     - name: Set Commit Status
       if: ${{ inputs.commit-status-regex && inputs.commit-status-name }}
       env:
-        GITHUB_TOKEN: '${{ github.token }}'
+        GITHUB_TOKEN: "${{ github.token }}"
       run: |
         STATUS=$(cat cumulusci-flow.log | grep -o '${{ inputs.commit-status-regex }}')
         gh api \
@@ -85,9 +89,9 @@ runs:
           -f description="${{ inputs.commit-status-description-prefix }}$STATUS" \
           -f context='${{ inputs.commit-status-name }}'
       shell: bash
-      
+
     - name: Delete Scratch Org
-      if: ${{ always() }}
+      if: always() && inputs.delete-scratch-org
       continue-on-error: true
       shell: bash
       run: cci org scratch_delete ${{ inputs.org-name }} || true
