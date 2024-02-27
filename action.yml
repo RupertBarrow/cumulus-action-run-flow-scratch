@@ -38,7 +38,9 @@ inputs:
   delete-scratch-org:
     description: "Delete the scratch org after the flow completes"
     required: false
-    default: true
+    type: choice
+    options: ["true", "false"]
+    default: "true"
 
 outputs:
   error-message:
@@ -91,7 +93,7 @@ runs:
       shell: bash
 
     - name: Delete Scratch Org
-      if: always() && inputs.delete-scratch-org
+      if: always() && inputs.delete-scratch-org == 'true'
       continue-on-error: true
       shell: bash
       run: cci org scratch_delete ${{ inputs.org-name }} || true
